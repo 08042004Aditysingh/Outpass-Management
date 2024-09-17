@@ -3,8 +3,89 @@ import Sidebar from './Sidebar';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import emailjs from "emailjs-com";
 const Hod = () => {
+  const [emailData, setEmailData] = useState({})
   const {id} = useParams();
+
+  const sendEmailLR = (row) => {
+    window.location.reload();
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for leave from date ${row.startDate} till ${row.endDate} has been rejected by HOD.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  const sendEmailOPR = (row) => {
+    window.location.reload();
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for outpass on date ${row.date} has been rejected by HOD.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  const sendEmail = (row) => {
+    window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear Sir, Please approve the leave request of ${row.name} from ${row.startDate} to ${row.endDate}.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  const sendEmailop = (row) => {
+    window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear Sir, Please approve the leave request of ${row.name} on date ${row.date}.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
   const navigate = useNavigate();
   const [leaveData, setLeaveData] = useState([]);
   const [outpassData, setOutpassData] = useState([]);
@@ -28,8 +109,40 @@ const Hod = () => {
       });
   }, []);
 
+  const handleAcceptop = async (row) => {
+    window.location.reload()
+
+
+    await axios.put(`http://localhost:5000/outpass/${row._id}`, {
+      name: row.name,
+      regNo: "22183",
+      status: "Accepted by HOD",
+      reason: row.reason,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      branch: row.branch,
+      hostel: row.hostel,
+      councelor: "Mrs. Nikita Singhal",
+    });
+  };
+
+  const handleAccept = async (row) => {
+    window.location.reload()
+
+    await axios.put(`http://localhost:5000/leave/${row._id}`, {
+      name: row.name,
+      regNo: "22183",
+      status: "Accepted by HOD",
+      reason: row.reason,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      branch: row.branch,
+      hostel: row.hostel,
+      councelor: "Mrs. Nikita Singhal",
+    });
+  };
+
   const handleRejectop = async (row) => {
-    window.location.reload();
     await axios
       .delete(`http://localhost:5000/hodop/${row._id}`)
       .then((response) => {
@@ -38,19 +151,18 @@ const Hod = () => {
 
     await axios.put(`http://localhost:5000/outpass/${row._id}`, {
       name: row.name,
-      regNo: "22183",
-      status: "Rejected",
+      regNo: row.regNo,
+      status: "Rejected by HOD",
       reason: row.reason,
       startDate: row.startDate,
       endDate: row.endDate,
       branch: row.branch,
       hostel: row.hostel,
-      councelor: "Mrs. Nikita Singhal",
+      counselor: row.counselor,
     });
   };
 
   const handleReject = async (row) => {
-    window.location.reload();
     await axios
       .delete(`http://localhost:5000/hodl/${row._id}`)
       .then((response) => {
@@ -59,20 +171,19 @@ const Hod = () => {
 
     await axios.put(`http://localhost:5000/leave/${row._id}`, {
       name: row.name,
-      regNo: "22183",
-      status: "Rejected",
+      regNo: row.regNo,
+      status: "Rejected by HOD",
       reason: row.reason,
       startDate: row.startDate,
       endDate: row.endDate,
       branch: row.branch,
       hostel: row.hostel,
-      councelor: "Mrs. Nikita Singhal",
+      counselor: row.counselor,
     });
-    navigate(`/${id}/hod`);
   };
   const handleForwardl = async(row) => {
     alert(`Forwarded ${row.name}'s request to Warden of Hostel ${row.hostel}`);
-    window.location.reload();
+    
     // await axios.delete(`http://localhost:5000/hodl/${row._id}`);
 
     await axios.post('http://localhost:5000/wardenl', { name: row.name, reason: row.reason, status: row.status, hostel:row.hostel, branch: row.branch,startDate:row.startDate, endDate:row.endDate }, {
@@ -91,7 +202,7 @@ const Hod = () => {
 
   const handleForwardop = async(row) => {
     alert(`Forwarded ${row.name}'s request to HOD`);
-    window.location.reload();
+    
     
     await axios.post('http://localhost:5000/wardenop', { name: row.name, reason: row.reason, status: row.status, hostel:row.hostel, branch: row.branch,date:row.date }, {
       headers: {
@@ -111,7 +222,7 @@ const Hod = () => {
     // marginLeft: '250px',
     backgroundColor: '#f4f4f4',
     minHeight: '100vh',
-    width:'70vw'
+    width:'75vw'
   };
 
   const headingStyle = {
@@ -199,7 +310,7 @@ const Hod = () => {
             </tr>
           </thead>
           <tbody>
-            {leaveData.map((row, index) => (
+            {leaveData.map((row, index) => (row.status==="Accepted by Counselor" &&
               <tr key={index}>
                 <td style={tdStyle}>{row.name}</td>
                 <td style={tdStyle}>{row.reason}</td>
@@ -207,11 +318,11 @@ const Hod = () => {
                 <td style={tdStyle}>{row.endDate}</td>
                 <td style={tdStyle}>{`${Math.floor(Math.random() * (95 - 50 + 1)) + 50}%`}</td>
                 <td style={tdStyle}>
-                  <button style={{ ...buttonStyle, ...acceptButtonStyle }}>Accept</button>
-                  <button style={{ ...buttonStyle, ...rejectButtonStyle }}  onClick={(e)=>{handleReject(row)}}>Reject</button>
+                  <button style={{ ...buttonStyle, ...acceptButtonStyle }} onClick={(e)=>{handleAccept(row)}}>Accept</button>
+                  <button style={{ ...buttonStyle, ...rejectButtonStyle }}  onClick={(e)=>{handleReject(row); sendEmailLR(row)}}>Reject</button>
                 </td>
                 <td style={tdStyle}>
-                  <button style={forwardButtonStyle} onClick={(e)=>{handleForwardl(row)}}>Forward</button>
+                  <button style={forwardButtonStyle} onClick={(e)=>{handleForwardl(row); sendEmail(row)}}>Forward</button>
                 </td>
               </tr>
             ))}
@@ -231,7 +342,7 @@ const Hod = () => {
             </tr>
           </thead>
           <tbody>
-            {outpassData.map((row, index) => (
+            {outpassData.map((row, index) => (row.status==="Accepted by Counselor" &&
               <tr key={index}>
                 <td style={tdStyle}>{row.name}</td>
                 <td style={tdStyle}>{row.reason}</td>
@@ -239,11 +350,11 @@ const Hod = () => {
                 <td style={tdStyle}>{`${Math.floor(Math.random() * (95 - 50 + 1)) + 50}%`}</td>
                 
                 <td style={tdStyle}>
-                  <button style={{ ...buttonStyle, ...acceptButtonStyle }}>Accept</button>
-                  <button style={{ ...buttonStyle, ...rejectButtonStyle }} onClick={(e)=>{handleRejectop(row)}}>Reject</button>
+                  <button style={{ ...buttonStyle, ...acceptButtonStyle }} onClick={(e)=>{handleAcceptop(row)}}>Accept</button>
+                  <button style={{ ...buttonStyle, ...rejectButtonStyle }} onClick={(e)=>{handleRejectop(row); sendEmailOPR(row)}}>Reject</button>
                 </td>
                 <td style={tdStyle}>
-                  <button style={forwardButtonStyle} onClick={(e)=>handleForwardop(row)}>Forward</button>
+                  <button style={forwardButtonStyle} onClick={(e)=>{handleForwardop(row); sendEmailop(row)}}>Forward</button>
                 </td>
               </tr>
             ))}

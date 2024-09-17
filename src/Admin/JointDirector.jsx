@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import emailjs from "emailjs-com";
 const JD = () => {
   const navigate = useNavigate();
+  const [emailData, setEmailData] = useState({})
   const {id} = useParams();
   const [leaveData, setLeaveData] = useState([]);
   const [outpassData, setOutpassData] = useState([]);
@@ -29,39 +31,122 @@ const JD = () => {
         console.error("Error fetching outpass data:", error);
       });
   }, []);
-  const handleAcceptOp = async (row) => {
+
+  const sendEmailopA = (row) => {
     window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for outpass has been ACCEPTED by the Joint Director on date ${row.date}`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+
+  const sendEmailopR = (row) => {
+    window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for outpass has been REJECTED by the Joint Director on date ${row.date}`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  
+  const sendEmailA = (row) => {
+    window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for leave has been ACCEPTED by the Joint Director from date ${row.startDate} to ${row.endDate}`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+
+  const sendEmailR = (row) => {
+    window.location.reload();
+    
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for leave has been REJECTED by the Joint Director from date ${row.startDate} to ${row.endDate}`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  
+  const handleAcceptOp = async (row) => {
+  
     await axios.delete(`http://localhost:5000/jointdirectorop/${row._id}`);
     await axios.put(`http://localhost:5000/outpass/${row._id}`, {
       name: row.name,
       regNo: "22183",
-      status: "Accepted",
+      status: "Approved by Joint Director",
       reason: row.reason,
       date: row.date,
       branch: row.branch,
       hostel: row.hostel,
       councelor: "Mrs. Nikita Singhal",
     });
-    navigate(`/${id}/jointdirector`);
   };
   const handleRejectOp = async (row) => {
-    window.location.reload();
+  
     await axios.delete(`http://localhost:5000/jointdirectorop/${row._id}`);
     await axios.put(`http://localhost:5000/outpass/${row._id}`, {
       name: row.name,
       regNo: "22183",
-      status: "Rejected",
+      status: "Rejected by Joint Director",
       reason: row.reason,
       date: row.date,
       branch: row.branch,
       hostel: row.hostel,
       councelor: "Mrs. Nikita Singhal",
     });
-    navigate(`/${id}/jointdirector`);
   };
 
   const handleAccept = async (row) => {
-    window.location.reload();
+   
     await axios
       .delete(`http://localhost:5000/jointdirectorl/${row._id}`)
       .then((response) => {
@@ -72,7 +157,7 @@ const JD = () => {
       .put(`http://localhost:5000/leave/${row._id}`, {
         name: row.name,
         regNo: "22183",
-        status: "Approved",
+        status: "Approved by Joint Director",
         reason: row.reason,
         startDate: row.startDate,
         endDate: row.endDate,
@@ -83,10 +168,9 @@ const JD = () => {
       .then((response) => {
         console.log(response.data);
       });
-      navigate(`/${id}/jointdirector`);
   };
   const handleReject = async (row) => {
-    window.location.reload();
+    
     await axios
       .delete(`http://localhost:5000/jointdirectorl/${row._id}`)
       .then((response) => {
@@ -95,7 +179,7 @@ const JD = () => {
       await axios.put(`http://localhost:5000/leave/${row._id}`, {
         name: row.name,
         regNo: "22183",
-        status: "Rejected",
+        status: "Rejected by Joint Director",
         reason: row.reason,
         startDate: row.startDate,
         endDate: row.endDate,
@@ -110,7 +194,7 @@ const JD = () => {
     // marginLeft: '250px',
     backgroundColor: "#f4f4f4",
     minHeight: "100vh",
-    width: "70vw",
+    width: "75vw",
   };
 
   const headingStyle = {
@@ -204,6 +288,7 @@ const JD = () => {
                     style={{ ...buttonStyle, ...acceptButtonStyle }}
                     onClick={(e) => {
                       handleAccept(row);
+                      sendEmailA(row);
                     }}
                   >
                     Accept
@@ -212,6 +297,7 @@ const JD = () => {
                     style={{ ...buttonStyle, ...rejectButtonStyle }}
                     onClick={(e) => {
                       handleReject(row);
+                      sendEmailR(row);
                     }}
                   >
                     Reject
@@ -247,6 +333,7 @@ const JD = () => {
                     style={{ ...buttonStyle, ...acceptButtonStyle }}
                     onClick={(e) => {
                       handleAcceptOp(row);
+                      sendEmailopA(row);
                     }}
                   >
                     Accept
@@ -255,6 +342,7 @@ const JD = () => {
                     style={{ ...buttonStyle, ...rejectButtonStyle }}
                     onClick={(e) => {
                       handleRejectOp(row);
+                      sendEmailopR(row);
                     }}
                   >
                     Reject

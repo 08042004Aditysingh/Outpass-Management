@@ -117,6 +117,7 @@ const Status = () => {
             <thead>
               <tr>
                 <th style={thStyle}>Date</th>
+                <th style={thStyle}>Councellor</th>
                 <th style={thStyle}>Branch</th>
                 <th style={thStyle}>Reason</th>
                 <th style={thStyle}>Status</th>
@@ -135,6 +136,7 @@ const Status = () => {
                 >
                   <td style={tdStyle}>{row.date}</td>
                   
+                  <td style={tdStyle}>{row.counselor}</td>
                   <td style={tdStyle}>{row.branch}</td>
                   <td style={tdStyle}>{row.reason}</td>
                   <td style={tdStyle}>{row.status}</td>
@@ -169,7 +171,7 @@ const Status = () => {
                       index % 2 === 0 ? '#00fbff' : '#ffffff')
                   }
                 >
-                  <td style={tdStyle}>{row.startDate}</td>
+                  <td style={tdStyle}>{row._id}</td>
                   <td style={tdStyle}>{row.endDate}</td>
                   <td style={tdStyle}>{row.counselor}</td>
                   <td style={tdStyle}>{row.branch}</td>

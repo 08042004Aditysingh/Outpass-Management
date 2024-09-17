@@ -3,8 +3,87 @@ import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import emailjs from "emailjs-com";
 const Warden = () => {
   const {id} = useParams();
+  const [emailData, setEmailData] = useState({})
+
+  const sendEmailLR = (row) => {
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for leave from date ${row.startDate} till ${row.endDate} has been rejected by Warden.`,
+      
+    })
+    
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+    .then((response) => {
+      console.log('Email successfully sent!', response.status, response.text);
+      alert('Email sent successfully!');
+    })
+    .catch((error) => {
+      console.error('Error sending email:', error);
+      alert('Failed to send the email.');
+    });
+    window.location.reload();
+  };
+  const sendEmailOPR = (row) => {
+    window.location.reload();
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear ${row.name}, your request for leave on date ${row.date} has been rejected by Warden.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  const sendEmail = (row) => {
+    window.location.reload();
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear Sir, Please approve the leave request of ${row.name} from ${row.startDate} to ${row.endDate}.`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
+  const sendEmailop = (row) => {
+    window.location.reload();
+    setEmailData({
+      name: id,
+      email: 'priyaju265@gmail.com',
+      message: `Dear Sir, Please approve the leave request of ${row.name} on date ${row.date}`,
+      
+    })
+
+    emailjs.send('service_aozwngw', 'template_5rd1m6e', emailData, '2pr-_qVYhjxZJbuwF')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+        alert('Email sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending email:', error);
+        alert('Failed to send the email.');
+      });
+  };
   const navigate = useNavigate();
   const [leaveData, setLeaveData] = useState([]);
   const [outpassData, setOutpassData] = useState([]);
@@ -30,8 +109,38 @@ const Warden = () => {
         console.error("Error fetching outpass data:", error);
       });
   }, []);
+
+  const handleAcceptop = async (row) => {
+
+
+    await axios.put(`http://localhost:5000/outpass/${row._id}`, {
+      name: row.name,
+      regNo: "22183",
+      status: "Accepted by Warden",
+      reason: row.reason,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      branch: row.branch,
+      hostel: row.hostel,
+      councelor: "Mrs. Nikita Singhal",
+    });
+  };
+
+  const handleAccept = async (row) => {
+
+    await axios.put(`http://localhost:5000/leave/${row._id}`, {
+      name: row.name,
+      regNo: "22183",
+      status: "Accepted by Warden",
+      reason: row.reason,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      branch: row.branch,
+      hostel: row.hostel,
+      councelor: "Mrs. Nikita Singhal",
+    });
+  };
   const handleRejectop = async (row) => {
-    window.location.reload();
     await axios
       .delete(`http://localhost:5000/wardenop/${row._id}`)
       .then((response) => {
@@ -41,7 +150,7 @@ const Warden = () => {
     await axios.put(`http://localhost:5000/outpass/${row._id}`, {
       name: row.name,
       regNo: "22183",
-      status: "Rejected",
+      status: "Rejected by Warden",
       reason: row.reason,
       startDate: row.startDate,
       endDate: row.endDate,
@@ -52,7 +161,6 @@ const Warden = () => {
   };
 
   const handleReject = async (row) => {
-    window.location.reload();
     await axios
       .delete(`http://localhost:5000/wardenl/${row._id}`)
       .then((response) => {
@@ -62,7 +170,7 @@ const Warden = () => {
     await axios.put(`http://localhost:5000/leave/${row._id}`, {
       name: row.name,
       regNo: "22183",
-      status: "Rejected",
+      status: "Rejected by Warden",
       reason: row.reason,
       startDate: row.startDate,
       endDate: row.endDate,
@@ -73,7 +181,7 @@ const Warden = () => {
   };
   const handleForwardL = async (row) => {
     alert(`Forwarded ${row.name}'s request to Joint Director`);
-    window.location.reload();
+    
     // await axios.delete(`http://localhost:5000/wardenl/${row._id}`);
 
     await axios
@@ -107,7 +215,7 @@ const Warden = () => {
 
   const handleForwardop = async(row) => {
     alert(`Forwarded ${row.name}'s request to Joint Director`);
-    window.location.reload();
+    
     // await axios.delete(`http://localhost:5000/wardenop/${row._id}`);
 
     await axios
@@ -142,7 +250,7 @@ const Warden = () => {
     // marginLeft: '250px',
     backgroundColor: "#f4f4f4",
     minHeight: "100vh",
-    width: "70vw",
+    width: "75vw",
   };
 
   const headingStyle = {
@@ -219,7 +327,7 @@ const Warden = () => {
             </tr>
           </thead>
           <tbody>
-            {leaveData.map((row, index) => (
+            {leaveData.map((row, index) => (row.status === "Rejected by HOD" &&
               <tr key={index}>
                 <td style={tdStyle}>{row.name}</td>
                 <td style={tdStyle}>{row.reason}</td>
@@ -228,13 +336,14 @@ const Warden = () => {
                 
                 <td style={tdStyle}>{`${Math.floor(Math.random() * (95 - 50 + 1)) + 50}%`}</td>
                 <td style={tdStyle}>
-                  <button style={{ ...buttonStyle, ...acceptButtonStyle }}>
+                  <button style={{ ...buttonStyle, ...acceptButtonStyle }} onClick={(e)=>{handleAccept(row)}}>
                     Accept
                   </button>
                   <button
                     style={{ ...buttonStyle, ...rejectButtonStyle }}
                     onClick={(e) => {
                       handleReject(row);
+                      sendEmailLR(row);
                     }}
                   >
                     Reject
@@ -243,6 +352,7 @@ const Warden = () => {
                     style={{ ...buttonStyle, ...forwardButtonStyle }}
                     onClick={(e) => {
                       handleForwardL(row);
+                      sendEmail(row);
                     }}
                   >
                     Forward to Joint Director
@@ -266,20 +376,21 @@ const Warden = () => {
             </tr>
           </thead>
           <tbody>
-            {outpassData.map((row, index) => (
+            {outpassData.map((row, index) => (row.status === "Rejected by HOD" &&
               <tr key={index}>
                 <td style={tdStyle}>{row.name}</td>
                 <td style={tdStyle}>{row.reason}</td>
                 <td style={tdStyle}>{row.date}</td>
                 <td style={tdStyle}>{`${Math.floor(Math.random() * (95 - 50 + 1)) + 50}%`}</td>
                 <td style={tdStyle}>
-                  <button style={{ ...buttonStyle, ...acceptButtonStyle }}>
+                  <button style={{ ...buttonStyle, ...acceptButtonStyle }} onClick={(e)=>{handleAcceptop(row)}}>
                     Accept
                   </button>
                   <button
                     style={{ ...buttonStyle, ...rejectButtonStyle }}
                     onClick={(e) => {
                       handleRejectop(row);
+                      sendEmailOPR(row);
                     }}
                   >
                     Reject
@@ -288,6 +399,7 @@ const Warden = () => {
                     style={{ ...buttonStyle, ...forwardButtonStyle }}
                     onClick={(e) => {
                       handleForwardop(row);
+                      sendEmailop(row);
                     }}
                   >
                     Forward to Joint Director

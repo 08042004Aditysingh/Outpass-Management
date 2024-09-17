@@ -1,17 +1,31 @@
-// StudentLogin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Student Login:', { username, password });
-    navigate(`/${username}/student-dashboard`); // Redirect to student dashboard or appropriate page
+
+    try {
+      const response = await axios.post("http://localhost:5000/login", { email, password });
+      
+      // Handle success response
+      if (response.status === 200) {
+        navigate(`/${email}/student-dashboard`);
+      }
+    } catch (error) {
+      // Handle error responses
+      if (error.response && error.response.status === 400) {
+        alert('Invalid email domain. Please use @aitpune.edu.in');
+      } else {
+        alert('An error occurred. Please try again.');
+      }
+      console.error('Error:', error);
+    }
   };
 
   const containerStyle = {
@@ -20,7 +34,7 @@ const Login = () => {
     alignItems: 'center',
     height: '100vh',
     backgroundColor: '#f0f2f5',
-    width:'70vw'
+    width: '70vw'
   };
 
   const formStyle = {
@@ -64,10 +78,10 @@ const Login = () => {
       <form style={formStyle} onSubmit={handleSubmit}>
         <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Student Login</h2>
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="@aitpune.edu.in"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
           style={inputStyle}
         />
@@ -93,3 +107,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./SideBar"; // Import Sidebar
 import axios from "axios"; // Import axios
 import { useParams } from "react-router-dom";
@@ -20,12 +20,67 @@ const StudentLogin = () => {
     status: "Pending",
   });
 
+  // Define counselor mapping for each branch
+  const counselorMapping = {
+    COMP: ["Rushali Patil", "Sushma Shirke", "Umakant Dhatrak", "M B Lonare", "Aarti Gangshetty", "Nikita Singhal", "Yogita Hambir", "NK Bansode", "Kuldeep Hule"],
+    IT: ["Rupali Bagate","Vaishali Ingale","Rahul Desai", "Yuvraj Gholap", "Kavita", "Hudedamani", "Dipika Birari", "Sandeep Samleti", "Sangeeta Jadhav"],
+    ENTC: ["Rajshree Suryawanshi", "Sandeep Bidwai", "Shilpa Pawar", "Girish Kapse", "Renuka Bhandari", "Vijay Karra", "Pragati Rana", "JB Jawale", "Komal Gill"],
+    MECH: ["RS Verma", "VR Kulkarni", "JD Patil","PM Purohit", "PV Dorlikar","RB Gurav", "YV Patel", "UV Awsarmol", "SM Gaikwad", "LD Jathar"],
+  };
+
+  // State to hold the list of counselors based on selected branch
+  const [availableCounselors, setAvailableCounselors] = useState([]);
+
+  // Update available counselors when branch changes
+  useEffect(() => {
+    if (formData.branch) {
+      setAvailableCounselors(counselorMapping[formData.branch] || []);
+      setFormData((prevData) => ({
+        ...prevData,
+        counselor: "", // Reset counselor selection when branch changes
+      }));
+    } else {
+      setAvailableCounselors([]);
+      setFormData((prevData) => ({
+        ...prevData,
+        counselor: "",
+      }));
+    }
+  }, [formData.branch]);
+
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
+
+  const handleClick=async()=>{
+    const url = 
+    option === "leave"
+      ? "http://localhost:5000/councellorl"
+      : "http://localhost:5000/councellorop";
+    const requestBody =
+      option === "leave"
+        ? {
+            name: formData.name,
+            reason: formData.reason,
+            status: formData.status,
+            branch: formData.branch,
+            hostel: formData.hostel,
+            startDate: formData.startDate,
+            endDate: formData.endDate,
+          }
+        : {
+            name: formData.name,
+            reason: formData.reason,
+            status: formData.status,
+            branch: formData.branch,
+            hostel: formData.hostel,
+            date: formData.date,
+        };
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,6 +117,20 @@ const StudentLogin = () => {
       const response = await axios.post(url, requestBody);
       if (response.status === 200 || response.status === 201) {
         alert("Form submitted successfully!");
+        // Optionally, reset the form here
+        setFormData({
+          name: "",
+          regNo: "",
+          date: "",
+          startDate: "",
+          endDate: "",
+          counselor: "",
+          reason: "",
+          branch: "",
+          hostel: "",
+          status: "Pending",
+        });
+        setOption("leave");
       } else {
         alert("Error submitting form.");
         console.error("Error Response:", response.data);
@@ -70,6 +139,9 @@ const StudentLogin = () => {
       console.error("Error:", err);
       alert("Error submitting form.");
     }
+
+
+    
   };
 
   const containerStyle = {
@@ -157,6 +229,7 @@ const StudentLogin = () => {
           <label style={labelStyle}>Select Option: </label>
           <select
             onChange={(e) => setOption(e.target.value)}
+            value={option}
             style={selectStyle}
           >
             <option value="leave">Leave</option>
@@ -204,14 +277,25 @@ const StudentLogin = () => {
               </div>
               <div style={formWrapperStyle}>
                 <label style={labelStyle}>Counselor Name: </label>
-                <input
-                  type="text"
+                <select
                   name="counselor"
                   value={formData.counselor}
                   onChange={handleInputChange}
                   required
-                  style={inputStyle}
-                />
+                  style={selectStyle}
+                  disabled={!formData.branch}
+                >
+                  <option value="">
+                    {formData.branch
+                      ? "Select Counselor"
+                      : "Select Branch First"}
+                  </option>
+                  {availableCounselors.map((counselor, index) => (
+                    <option key={index} value={counselor}>
+                      {counselor}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -242,14 +326,25 @@ const StudentLogin = () => {
               </div>
               <div style={formWrapperStyle}>
                 <label style={labelStyle}>Counselor Name: </label>
-                <input
-                  type="text"
+                <select
                   name="counselor"
                   value={formData.counselor}
                   onChange={handleInputChange}
                   required
-                  style={inputStyle}
-                />
+                  style={selectStyle}
+                  disabled={!formData.branch}
+                >
+                  <option value="">
+                    {formData.branch
+                      ? "Select Counselor"
+                      : "Select Branch First"}
+                  </option>
+                  {availableCounselors.map((counselor, index) => (
+                    <option key={index} value={counselor}>
+                      {counselor}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -301,10 +396,11 @@ const StudentLogin = () => {
           <button type="submit" style={buttonStyle}>
             Submit
           </button>
+          
         </form>
       </div>
     </div>
   );
 };
 
-export default StudentLogin;
+export default StudentLogin
